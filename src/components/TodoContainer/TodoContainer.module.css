@@ -1,0 +1,42 @@
+.todoWrapper {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 25px;
+}
+
+.todoWrapper h2 {
+    font-size: 30px;
+    letter-spacing: 1px;
+    margin-top: 20px;
+    color: var(--h2-color);
+}
+
+.sortFilterWrapper{
+    display: flex;
+    gap: 10px;
+    width: 100%;
+    justify-content: center;
+}
+
+@media all and (max-width:1024px) {
+    .todoWrapper h2 {
+        font-size: 24px;
+    }
+}
+
+@media all and (max-width:480px) {
+    .todoWrapper {
+        gap: 10px;
+    }
+
+    .todoWrapper h2 {
+        margin-top: 10px;
+        font-size: 20px;
+    }
+
+    .sortFilterWrapper{
+        flex-direction: column;
+        align-items: center
+    }
+}

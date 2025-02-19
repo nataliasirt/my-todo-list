@@ -1,0 +1,13 @@
+.sorting{
+    font-size: 16px;
+    letter-spacing: 0.7px;
+    width: 190px;
+    border-radius: 8px;
+}
+
+@media all and (max-width:480px) {
+    .sorting{
+        width: 250px;
+        padding: 5px 0;
+    }
+}

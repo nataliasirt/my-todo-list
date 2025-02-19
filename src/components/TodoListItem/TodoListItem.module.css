@@ -1,0 +1,85 @@
+.listItem {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    padding: 10px 20px 0px;
+}
+
+.listItemTop {
+    display: flex;
+    align-items: center;
+    width: 100%;
+}
+
+.listItemActions {
+    display: flex;
+    gap: 5px;
+    margin-top: 5px;
+}
+
+.checkbox {
+    transform:scale(1.3);
+    margin-right: 5px;
+}
+
+.listItem input {
+    font-size: 20px;
+    padding: 3px 5px;
+    border-radius: 8px;
+}
+
+.listItem input:hover {
+    text-decoration: underline;
+    cursor: pointer;
+}
+
+.listItem input:disabled{
+    background-color:var(--li-background);
+    border: none;
+}
+
+.checked {
+    text-decoration: line-through;
+}
+
+.listItem button {
+    padding: 5px;
+    margin-left: 5px;
+    font-size: 16px;
+    width: 30px;
+    height: 30px;
+    background-color:var(--li-background)
+}
+
+.edit:hover{
+    background-color:#7dedba;
+}
+
+.delete:hover{
+    background-color:#ed7d8a;
+}
+
+.date {
+    font-size: 16px;
+    margin: 0px 0px 3px 35px;
+    color: #bab9b9;
+    font-style: italic;
+    font-size: 12px;
+    letter-spacing: 1px;
+}
+
+@media all and (max-width:480px) {
+    .listItem {
+        padding: 3px 10px 0px;
+    }
+    .listItem button {
+        width: 25px;
+        height: 25px;
+    }
+    .listItem input {
+        font-size: 16px;
+    }
+    .date{
+        font-size: 10px;
+    }
+}

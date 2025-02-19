@@ -1,0 +1,19 @@
+.headerWrapper {
+    min-height: 60px;
+    background-color: #419c5d;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.logoBtn {
+    font-size: 25px;
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    margin-left: 15px;
+}
+
+.logoBtn:hover {
+    background-color:#aacbff;
+}

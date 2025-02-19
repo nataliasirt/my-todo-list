@@ -1,0 +1,17 @@
+.searchWrapper {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+}
+
+.searchWrapper input{
+    width: 345px;
+    margin-top: 25px;
+}
+
+@media all and (max-width:768px){
+    .searchWrapper input{
+        width: 250px;
+        margin-top: 10px;
+    }
+}
