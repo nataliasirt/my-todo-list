@@ -4,7 +4,7 @@ import PropTypes from 'prop-types';
 import style from './TodoListItem.module.css';
 import { useState } from "react";
 
-const TodoListItem = ({ title, id, completed, date, onRemoveTodo, onEditTodo, onChangeStatus }) => {
+const TodoListItem = ({ title, id, completed, onRemoveTodo, onEditTodo, onChangeStatus }) => {
     const [isDisabled, setIsDisabled] = useState(true);
     const [newTitle, setNewTitle] = useState(title);
     const [isChecked, setIsChecked] = useState(completed);
@@ -36,8 +36,7 @@ const TodoListItem = ({ title, id, completed, date, onRemoveTodo, onEditTodo, on
 
     const checkedStyle = isChecked ? style.checked : '';
 
-    const createdDate = new Date(date).toLocaleString("en-US", { year: 'numeric', month: 'numeric', day: 'numeric'});
-
+   
     return (
         <li className={style.listItem}>
             <div className={style.listItemTop}>
@@ -66,7 +65,6 @@ const TodoListItem = ({ title, id, completed, date, onRemoveTodo, onEditTodo, on
                     <MdDeleteOutline />
                 </button>
             </div>
-            <span className={style.date}>Created {createdDate}</span>
         </li>
     );
     

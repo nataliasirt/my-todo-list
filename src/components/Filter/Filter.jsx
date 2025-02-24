@@ -11,7 +11,7 @@ const FilterList = ({ setFilter, filter }) => {
 
     const buttons = buttonsData.map(({id, label}) => {
         const active = filter === id;
-        const clazz = active ? `${style.active}` : '';
+        const clazz = active ? style.active : "";
         return (
             <button type="button" 
             className={`${style.button} ${clazz}`}

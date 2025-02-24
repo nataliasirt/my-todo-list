@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 /* eslint-disable no-useless-escape */
 import { useEffect, useState } from "react";
 import AddTodoForm from "../AddTodoForm/AddTodoForm";
@@ -42,15 +43,15 @@ const TodoContainer = () => {
 
     const getTodos = () => {
         setIsLoading(true);
-        request('GET', null, null, _apiBase)
+        request('GET', "application/json", null, _apiBase)
             .then(data => {
-                const todos = data.records.sort((a, b) => a.fields.title < b.fields.title ? -1 : 1)
+                const todos = data.records.sort((a, b) => a.fields.title.localeCompare(b.fields.title)) 
                     .map((todo) => {
                         return { id: todo.id, title: todo.fields.title, completed: todo.fields.completed || false, date: todo.createdTime };
                     });
                 setTodoList(todos);
                 setIsLoading(false);
-            })
+            });
     }
 
     const addTodo = (todoTitle) => {
@@ -65,9 +66,8 @@ const TodoContainer = () => {
                 const postedTodo = {
                     id: data.id,
                     title: data.fields.title,
-                    date: new Date(data.createdTime).toLocaleString("en-US", { year: 'numeric', month: 'numeric', day: 'numeric' })
                 }
-                setTodoList([...todoList, postedTodo].sort((a, b) => a.title < b.title ? -1 : 1));
+                setTodoList(prevList => [...prevList, postedTodo].sort((a, b) => a.title.localeCompare(b.title)));
             });
     };
 
@@ -76,12 +76,12 @@ const TodoContainer = () => {
             id: id,
         };
 
-        request("DELETE", "application/json", JSON.stringify(removedId), `${_apiBase}\/${removedId.id}`)
+        request("DELETE", "application/json", null, `${_apiBase}/${id}`)
             .then(data => {
-                const editedTodoList = todoList.filter(todo => todo.id !== data.id);
-                setTodoList(editedTodoList);
+                if (!data) return;
+                setTodoList(prevList => prevList.filter(todo => todo.id !== id)); // Fixed filtering logic
             });
-    }
+    };
 
     const handleSearch = (value) => {
         setSearchTerm(value);
@@ -154,18 +154,19 @@ const TodoContainer = () => {
             <div className={styles.sortFilterWrapper}>
                 <Sorting onSort={sortTodos} />
                 <FilterList setFilter={setFilter} filter={filter}/>
-            </div>
-            {todoList.length == completedTodos.length
+                </div>
+            {todoList.length === completedTodos.length
                 ? <h2>You have nothing to do</h2>
                 : <h2>You have {todoList.length - completedTodos.length} more things to do, {completedTodos.length} done</h2>}
-            {isLoading ? <h2>Loading...</h2> 
-                : <TodoList todoList={searchedTodos}
+            {!isLoading && (
+                <TodoList
+                    todoList={searchedTodos}
                     onRemoveTodo={removeTodo}
                     onEditTodo={editTodo}
                     onChangeStatus={changeTodoStatus}
-                    filter={filter} 
-                    />
-            }
+                    filter={filter}
+                />
+            )}
         </div>
     )
 }

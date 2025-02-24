@@ -9,7 +9,7 @@
 
 .mainPageWrapper h1{
     position: relative;
-    top: 125px;
+    top: 200px;
 }
 
 .mainPageWrapper button {
@@ -18,11 +18,47 @@
     letter-spacing: 2px;
     padding: 15px 40px;
     background-color: #e7e7e7;
-    margin-top: 30px;
+    margin-top: 10px;
+    margin-bottom: 10px;
+    cursor: pointer;
+    margin: 20px auto 10px; /* Reduced bottom margin */
+}
+.mainPageWrapper .second-button {
+    background-color: #d4d4d4; /* Slightly different color */
 }
 
 .mainPageWrapper button:hover {
     background-color: #d6e6ff;
+}
+.mainPageWrapper {
+    position: relative;
+    min-height: 100vh; /* Ensures it takes up full screen height */
+}
+.adviceText {
+    position: absolute;
+    top: 50%;       /* Moves it to the middle */
+    right: 1px;    /* Positions it on the right side */
+    transform: translateY(-50%); /* Centers vertically */
+    width: 40%;     /* Limits width for readability */
+    text-align: center;
+    font-size: 22px;
+    font-weight: bold;
+}
+.adviceBox {
+    position: absolute;
+    top: 50%;       /* Centers vertically */
+    right: 20px;    /* Positions on the right */
+    transform: translateY(-50%); /* Centers vertically */
+    width: 300px;   /* Adjust width as needed */
+    padding: 20px;
+    background-color: #f9f9f9;  /* Light background */
+    border-radius: 15px;  /* Rounded corners */
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1); /* Soft shadow */
+    text-align: center;
+    font-size: 20px;
+    font-weight: bold;
+    color: #333;
+    border: 2px solid #ddd; /* Subtle border */
 }
 
 @media all and (max-width:480px) {

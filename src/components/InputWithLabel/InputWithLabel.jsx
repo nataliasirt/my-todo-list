@@ -1,5 +1,5 @@
+/* eslint-disable no-unused-vars */
 import { useEffect, useRef } from "react";
-
 import PropTypes from 'prop-types';
 import styles from './InputWithLabel.module.css';
 

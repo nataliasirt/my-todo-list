@@ -3,7 +3,7 @@
     display: flex;
     justify-content: center;
     align-items: center;
-    gap: 10px;
+    gap: 1px;
 }
 
 .form input {
@@ -11,11 +11,13 @@
 }
 
 .form button {
-    width: 40px;
+    align-items: center;
+    width: 55px;
     height: 40px;
-    font-size: 24px;
+    font-size: 20px;
     border: none;
     background-color: #e7e7e7;
+    margin-top: 50px;
 }
 
 .form button:hover {

@@ -25,7 +25,7 @@ const AddTodoForm = ({onAddTodo}) => {
                 name="title"
                 onChange={handleTitleChange} 
                 value={todoTitle}
-                placeholder="Add New Todo"
+                placeholder="Enter New Todo"
                 >
                 </InputWithLabel> 
             <button type="submit">Add</button>
