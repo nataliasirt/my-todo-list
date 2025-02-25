@@ -1,7 +1,8 @@
 .todoItem {
     display: flex;
-    flex-direction: column;
+    flex-direction: center;
     width: 100%;
+    gap: 12px;
 }
 ul {
     display: flex;

@@ -1,11 +1,9 @@
 /* eslint-disable no-unused-vars */
-/* eslint-disable no-useless-escape */
 import { useEffect, useState } from "react";
 import AddTodoForm from "../AddTodoForm/AddTodoForm";
-import FilterList from "../Filter/Filter";
 import Search from "../Search/Search";
 import Sorting from "../Sorting/Sorting";
-import TodoList from "../TodoList/TodoList";
+import { FiEdit, FiTrash2 } from 'react-icons/fi'; // Import icons for Edit and Remove
 import styles from './TodoContainer.module.css';
 
 const request = async (method, type, body, url) => {
@@ -16,24 +14,26 @@ const request = async (method, type, body, url) => {
             Authorization: `Bearer ${import.meta.env.VITE_AIRTABLE_API_TOKEN}`,
         },
         body: body,
-    }
+    };
 
     try {
         const response = await fetch(url, options);
         if (!response.ok) {
-            throw new Error(`Error has ocurred: ${response.status}`);
+            throw new Error(`Error has occurred: ${response.status}`);
         }
         return await response.json();
     } catch (error) {
-        console.log(error.message);
+        console.error("Request error:", error.message);
+        return null;
     }
-}
+};
 
 const TodoContainer = () => {
     const [todoList, setTodoList] = useState([]);
     const [isLoading, setIsLoading] = useState(true);
-    const [searchTerm, setSearchTerm] = useState('');
-    const [filter, setFilter] = useState('All');
+    const [searchTerm, setSearchTerm] = useState("");
+    const [editingTodo, setEditingTodo] = useState(null);
+    const [newTitle, setNewTitle] = useState("");
 
     const _apiBase = `https://api.airtable.com/v0/${import.meta.env.VITE_AIRTABLE_BASE_ID}/${import.meta.env.VITE_TABLE_NAME}`;
 
@@ -41,111 +41,100 @@ const TodoContainer = () => {
         getTodos();
     }, []);
 
-    const getTodos = () => {
+    const getTodos = async () => {
         setIsLoading(true);
-        request('GET', "application/json", null, _apiBase)
-            .then(data => {
-                const todos = data.records.sort((a, b) => a.fields.title.localeCompare(b.fields.title)) 
-                    .map((todo) => {
-                        return { id: todo.id, title: todo.fields.title, completed: todo.fields.completed || false, date: todo.createdTime };
-                    });
-                setTodoList(todos);
-                setIsLoading(false);
-            });
-    }
+        const data = await request("GET", "application/json", null, _apiBase);
+        console.log("Raw API response:", data);
 
-    const addTodo = (todoTitle) => {
-        const addedTodo = {
-            fields: {
-                title: todoTitle,
-            },
-        };
+        if (!data || !data.records) {
+            console.error("No valid data or records received");
+            setTodoList([]);
+            setIsLoading(false);
+            return;
+        }
 
-        request("POST", "application/json", JSON.stringify(addedTodo), _apiBase)
-            .then((data) => {
-                const postedTodo = {
-                    id: data.id,
-                    title: data.fields.title,
-                }
-                setTodoList(prevList => [...prevList, postedTodo].sort((a, b) => a.title.localeCompare(b.title)));
-            });
+        const todos = data.records
+            .map((todo) => ({
+                id: todo.id,
+                title: todo.fields.title || "Untitled",
+                completed: todo.fields.completed || false,
+                date: todo.createdTime,
+            }))
+            .sort((a, b) => a.title.localeCompare(b.title));
+
+        console.log("Processed todos:", todos);
+        setTodoList(todos);
+        setIsLoading(false);
     };
 
-    const removeTodo = (id) => {
-        const removedId = {
-            id: id,
-        };
-
-        request("DELETE", "application/json", null, `${_apiBase}/${id}`)
-            .then(data => {
-                if (!data) return;
-                setTodoList(prevList => prevList.filter(todo => todo.id !== id)); // Fixed filtering logic
-            });
+    const addTodo = async (todoTitle) => {
+        const addedTodo = { fields: { title: todoTitle } };
+        const data = await request("POST", "application/json", JSON.stringify(addedTodo), _apiBase);
+        if (data) {
+            const postedTodo = { id: data.id, title: data.fields.title };
+            setTodoList((prevList) => [...prevList, postedTodo].sort((a, b) => a.title.localeCompare(b.title)));
+        }
     };
 
-    const handleSearch = (value) => {
-        setSearchTerm(value);
-    }
-    const searchedTodos = todoList.filter(todo => {
-        return todo.title.toLowerCase().includes(searchTerm.toLowerCase())
-    })
+    const removeTodo = async (id) => {
+        const data = await request("DELETE", "application/json", null, `${_apiBase}/${id}`);
+        if (data) {
+            setTodoList((prevList) => prevList.filter((todo) => todo.id !== id));
+        }
+    };
 
-    const editTodo = (id, newTitle) => {
-        const editedTodo = {
-            fields: {
-                title: newTitle,
-            },
-        };
+    const editTodo = async (id, title) => {
+        if (!newTitle.trim()) return;
+        const editedTodo = { fields: { title: newTitle } };
+        const data = await request("PATCH", "application/json", JSON.stringify(editedTodo), `${_apiBase}/${id}`);
+        if (data) {
+            setTodoList((prevList) =>
+                prevList.map((todo) => (todo.id === data.id ? { ...todo, title: data.fields.title } : todo))
+            );
+            setEditingTodo(null);
+            setNewTitle("");
+        }
+    };
 
-        request("PATCH", "application/json", JSON.stringify(editedTodo), `${_apiBase}\/${id}`)
-            .then(data => {
-                const editedTodoList = todoList.map(todo => {
-                    if (todo.id === data.id) {
-                        return {
-                            ...todo, title: data.fields.title
-                        }
-                    } else return todo;
-                });
-                setTodoList(editedTodoList);
-            })
-    }
+    const changeTodoStatus = async (id, value) => {
+        console.log("Changing status for ID:", id, "to:", value);
+        const todoStatus = { fields: { completed: value } };
+        const data = await request("PATCH", "application/json", JSON.stringify(todoStatus), `${_apiBase}/${id}`);
+        console.log("PATCH response for status change:", data);
+        if (data) {
+            setTodoList((prevList) =>
+                prevList.map((todo) =>
+                    todo.id === data.id ? { ...todo, completed: data.fields.completed || false } : todo
+                )
+            );
+        } else {
+            console.error("Failed to update todo status");
+        }
+    };
 
-    const changeTodoStatus = (id, value) => {
-        const todoStatus = {
-            fields: {
-                completed: value,
-            },
-        };
+    const handleSearch = (value) => setSearchTerm(value);
 
-        request("PATCH", "application/json", JSON.stringify(todoStatus), `${_apiBase}\/${id}`)
-            .then(data => {
-                const editedTodoList = todoList.map(todo => {
-                    if (todo.id === data.id) {
-                        return data.fields.completed ? { ...todo, completed: data.fields.completed } : { ...todo, completed: false };
-                    } else return todo;
-                });
-                setTodoList(editedTodoList);
-            })
-    }
-
-    let completedTodos = todoList.filter(todo => todo.completed);
+    const searchedTodos = todoList.filter((todo) =>
+        todo.title.toLowerCase().includes(searchTerm.toLowerCase())
+    );
 
     const sortTodos = (value) => {
         switch (value) {
             case "titleDesc":
-                setTodoList(prevTodoList => [...prevTodoList].sort((a, b) => a.title < b.title ? 1 : -1));
+                setTodoList((prevTodoList) => [...prevTodoList].sort((a, b) => (a.title < b.title ? 1 : -1)));
                 break;
             case "dateAsc":
-                setTodoList(prevTodoList => [...prevTodoList].sort((a, b) => new Date(a.date) - new Date(b.date)));
+                setTodoList((prevTodoList) => [...prevTodoList].sort((a, b) => new Date(a.date) - new Date(b.date)));
                 break;
             case "dateDesc":
-                setTodoList(prevTodoList => [...prevTodoList].sort((a, b) => new Date(b.date) - new Date(a.date)));;
+                setTodoList((prevTodoList) => [...prevTodoList].sort((a, b) => new Date(b.date) - new Date(a.date)));
                 break;
             default:
-                //default sorting by "titleAsc"
-                setTodoList(prevTodoList => [...prevTodoList].sort((a, b) => a.title < b.title ? -1 : 1));
+                setTodoList((prevTodoList) => [...prevTodoList].sort((a, b) => (a.title < b.title ? -1 : 1)));
         }
-    }
+    };
+
+    console.log("Render - isLoading:", isLoading, "todoList:", todoList, "searchedTodos:", searchedTodos, "editingTodo:", editingTodo);
 
     return (
         <div className={styles.todoWrapper}>
@@ -153,22 +142,86 @@ const TodoContainer = () => {
             <Search onSearch={handleSearch} searchTerm={searchTerm} />
             <div className={styles.sortFilterWrapper}>
                 <Sorting onSort={sortTodos} />
-                <FilterList setFilter={setFilter} filter={filter}/>
-                </div>
-            {todoList.length === completedTodos.length
-                ? <h2>You have nothing to do</h2>
-                : <h2>You have {todoList.length - completedTodos.length} more things to do, {completedTodos.length} done</h2>}
-            {!isLoading && (
-                <TodoList
-                    todoList={searchedTodos}
-                    onRemoveTodo={removeTodo}
-                    onEditTodo={editTodo}
-                    onChangeStatus={changeTodoStatus}
-                    filter={filter}
-                />
+            </div>
+            {isLoading ? (
+                <p>Loading todos...</p>
+            ) : todoList.length === 0 ? (
+                <h2>No todos available</h2>
+            ) : (
+                <>
+                    <h2>
+                        {searchedTodos.length === 0
+                            ? "No matching todos"
+                            : `${searchedTodos.length} todo${searchedTodos.length === 1 ? "" : "s"} to work on`}
+                    </h2>
+                    <div className={styles.todoList}> {/* Changed from <ul> to <div> for horizontal layout */}
+                        {searchedTodos.map((todo) => (
+                            <div key={todo.id} className={styles.todoItem}>
+                                <input
+                                    type="checkbox"
+                                    checked={todo.completed}
+                                    onChange={(e) => changeTodoStatus(todo.id, e.target.checked)}
+                                    className={styles.checkbox}
+                                />
+                                {editingTodo === todo.id ? (
+                                    <div className={styles.editContainer}>
+                                        <input
+                                            type="text"
+                                            value={newTitle}
+                                            onChange={(e) => setNewTitle(e.target.value)}
+                                            onKeyPress={(e) => {
+                                                if (e.key === "Enter") {
+                                                    editTodo(todo.id, todo.title);
+                                                }
+                                            }}
+                                            autoFocus
+                                            className={styles.editInput}
+                                        />
+                                        <button
+                                            onClick={() => editTodo(todo.id, todo.title)}
+                                            className={styles.saveButton}
+                                        >
+                                            ✓
+                                        </button>
+                                        <button
+                                            onClick={() => {
+                                                setEditingTodo(null);
+                                                setNewTitle("");
+                                            }}
+                                            className={styles.cancelButton}
+                                        >
+                                            ✗
+                                        </button>
+                                    </div>
+                                ) : (
+                                    <>
+                                        <span style={{ textDecoration: todo.completed ? "line-through" : "none" }} className={styles.todoTitle}>
+                                            {todo.title}
+                                        </span>
+                                        <button
+                                            onClick={() => {
+                                                setEditingTodo(todo.id);
+                                                setNewTitle(todo.title);
+                                            }}
+                                            className={styles.editButton}
+                                        >
+                                            <FiEdit />
+                                        </button>
+                                        <button
+                                            onClick={() => removeTodo(todo.id)}
+                                            className={styles.removeButton}
+                                        >
+                                            <FiTrash2 />
+                                        </button>
+                                    </>
+                                )}
+                            </div>
+                        ))}
+                    </div>
+                </>
             )}
         </div>
-    )
-}
+    );
+};
 
 export default TodoContainer;

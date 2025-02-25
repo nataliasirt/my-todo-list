@@ -6,7 +6,7 @@ const NotFoundPage = () => {
     return (
         <div className={styles.notFoundPageWrapper}>
             <img src={img} alt="Error 404"/>
-            <Link to="/">Back to main page</Link>
+            <Link to="/">Back to main</Link>
         </div>
     );
 };
