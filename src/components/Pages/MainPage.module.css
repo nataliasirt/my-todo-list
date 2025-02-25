@@ -21,10 +21,10 @@
     margin-top: 10px;
     margin-bottom: 10px;
     cursor: pointer;
-    margin: 20px auto 10px; /* Reduced bottom margin */
+    margin: 20px auto 10px; 
 }
 .mainPageWrapper .second-button {
-    background-color: #d4d4d4; /* Slightly different color */
+    background-color: #d4d4d4; 
 }
 
 .mainPageWrapper button:hover {
@@ -32,21 +32,21 @@
 }
 .mainPageWrapper {
     position: relative;
-    min-height: 100vh; /* Ensures it takes up full screen height */
+    min-height: 100vh;
 }
 .adviceText {
     position: absolute;
-    top: 50%;       /* Moves it to the middle */
-    right: 1px;    /* Positions it on the right side */
-    transform: translateY(-50%); /* Centers vertically */
-    width: 40%;     /* Limits width for readability */
+    top: 50%;      
+    right: 1px;    
+    transform: translateY(-50%); 
+    width: 40%;     
     text-align: center;
     font-size: 22px;
     font-weight: bold;
 }
 .adviceBox {
     position: absolute;
-    top: 50%;       /* Centers vertically */
+    top: 50%;       
     right: 20px;    /* Positions on the right */
     transform: translateY(-50%); /* Centers vertically */
     width: 300px;   /* Adjust width as needed */

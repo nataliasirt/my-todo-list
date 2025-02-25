@@ -154,7 +154,7 @@ const TodoContainer = () => {
                             ? "No matching todos"
                             : `${searchedTodos.length} todo${searchedTodos.length === 1 ? "" : "s"} to work on`}
                     </h2>
-                    <div className={styles.todoList}> {/* Changed from <ul> to <div> for horizontal layout */}
+                    <div className={styles.todoList}> {}
                         {searchedTodos.map((todo) => (
                             <div key={todo.id} className={styles.todoItem}>
                                 <input
